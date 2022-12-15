@@ -1,8 +1,4 @@
-const initialState = [
-  { id: 0, text: 'Learn React', completed: true },
-  { id: 1, text: 'Learn Redux', completed: false, color: 'purple' },
-  { id: 2, text: 'Build something fun!', completed: false, color: 'blue' },
-]
+const initialState = []
 
 function nextTodoId(todos) {
   const maxId = todos.reduce((maxId, todo) => Math.max(todo.id, maxId), -1)
@@ -40,26 +36,40 @@ export default function todosReducer(state = initialState, action) {
       })
     }
     case 'todos/colorSelected': {
-      return {
-        todos: state.map((todo) => {
-          // if this isn't the todo we're looking for, leave it alone
-          if (todo.id !== action.payload.todoId) {
-            return todo
-          }
-          // We've found the todo that has to change. Return a copy:
-          return {
-            ...todo,
-            // Set the selected color
-            color: action.payload.color,
-          }
-        }),
-      }
+      const {color, todoId} = action.payload
+      return state.map((todo) => {
+        // if this isn't the todo we're looking for, leave it alone
+        if (todo.id !== todoId) {
+          return todo
+        }
+        // We've found the todo that has to change. Return a copy:
+        return {
+          ...todo,
+          // Set the selected color
+          color,
+        }
+      })
     }
     case 'todos/todoDeleted': {
       // Array.filter returns a copy of the original array so no need
       // to make a copy first
-      return state.filter((todo) => todo.id !== action.payload.todoId)
+      return state.filter((todo) => todo.id !== action.payload)
     }
+    case 'todos/allCompleted': {
+      return state.map((todo) => {
+        // Make a copy of state
+        return {
+          ...todo,
+          // Set the todo to completed
+          completed: true,
+        }
+      })
+    }
+    case 'todos/completedCleared': {
+      // Array.filter returns a copy of the original array so no need
+      // to make a copy first
+      return state.filter((todo) => !todo.completed)
+      }
     default:
       // if This reducer doesn't recognize the action type, or doesn't
       // care about this specific action, return the existing state unchanged
